@@ -1,0 +1,149 @@
+{
+ "owani": {
+  "file": "owani.svg",
+  "source_url": "https://www.owani-ski.com/",
+  "motif_zh": "大鰐溫泉",
+  "motif_en": "Owani onsen",
+  "color": "#044588"
+ },
+ "hakkoda": {
+  "file": "hakkoda.svg",
+  "source_url": "https://www.hakkoda-ropeway.jp/",
+  "motif_zh": "樹冰",
+  "motif_en": "Snow monsters",
+  "color": "#0a6fcd"
+ },
+ "spring": {
+  "file": "spring.svg",
+  "source_url": "https://aomorispring.com/",
+  "motif_zh": "岩木山",
+  "motif_en": "Mt. Iwaki",
+  "color": "#7a4a2a"
+ },
+ "hyakuzawa": {
+  "file": "hyakuzawa.svg",
+  "source_url": "https://hyakuzawa-ski.com/",
+  "motif_zh": "岩木山",
+  "motif_en": "Mt. Iwaki",
+  "color": "#2d6ab0"
+ },
+ "yokoshi": {
+  "file": null,
+  "source_url": "https://www.town.hiranai.aomori.jp/",
+  "motif_zh": "陸奧灣",
+  "motif_en": "Mutsu Bay",
+  "color": "#2f7fb5"
+ },
+ "moya": {
+  "file": "moya.svg",
+  "source_url": "https://moyahills.jp/_src/93538298/sign.png",
+  "motif_zh": "青森夜景",
+  "motif_en": "Aomori city view",
+  "color": "#182e70"
+ },
+ "geto": {
+  "file": "geto.svg",
+  "source_url": "https://getokogen.com/winter/",
+  "motif_zh": "粉雪",
+  "motif_en": "Deep powder",
+  "color": "#c33d3d"
+ },
+ "iwatekogen": {
+  "file": "iwatekogen.svg",
+  "source_url": "https://iwatekogen.jp/resources/img/iwt/header_iwate.png",
+  "motif_zh": "岩手山",
+  "motif_en": "Mt. Iwate",
+  "color": "#c60076"
+ },
+ "shizukuishi": {
+  "file": "shizukuishi.svg",
+  "source_url": "https://www.princehotels.co.jp/ski/shizukuishi/images/sp_header_logo.png",
+  "motif_zh": "岩手山",
+  "motif_en": "Mt. Iwate",
+  "color": "#1d4f91"
+ },
+ "appi": {
+  "file": "appi.svg",
+  "source_url": "https://www.appi.co.jp/",
+  "motif_zh": "粉雪",
+  "motif_en": "Aspirin powder",
+  "color": "#1b5fa6"
+ },
+ "okunaka": {
+  "file": "okunaka.svg",
+  "source_url": "https://www.okunakayamakogen.jp/",
+  "motif_zh": "高原",
+  "motif_en": "Highland",
+  "color": "#2a6b8f"
+ },
+ "ani": {
+  "file": "ani.svg",
+  "source_url": "https://www.aniski.jp/wordpress/wp-content/themes/aniski/img/logo.svg",
+  "motif_zh": "樹冰",
+  "motif_en": "Snow monsters",
+  "color": "#4b8fb8"
+ },
+ "shimokura": {
+  "file": "shimokura.svg",
+  "source_url": "https://www.hachimantai-resort.jp/",
+  "motif_zh": "八幡平",
+  "motif_en": "Hachimantai",
+  "color": "#01409a"
+ },
+ "amihari": {
+  "file": null,
+  "source_url": "https://www.qkamura.or.jp/iwate/",
+  "motif_zh": "溫泉",
+  "motif_en": "Onsen",
+  "color": "#c0573a"
+ },
+ "tazawako": {
+  "file": "tazawako.svg",
+  "source_url": "https://www.tazawako-ski.com/site/wp-content/themes/tazaski/img/common/footer_title.png",
+  "motif_zh": "田澤湖",
+  "motif_en": "Lake Tazawa",
+  "color": "#1f90d0"
+ },
+ "onikobe": {
+  "file": "onikobe.svg",
+  "source_url": "https://www.onikoube.com/snow/wp-content/uploads/2025/03/logo01.png",
+  "motif_zh": "鳴子溫泉",
+  "motif_en": "Naruko onsen",
+  "color": "#1c2c56"
+ },
+ "jangle": {
+  "file": "jangle.svg",
+  "source_url": "https://jxj.co.jp/resources/img/jxj/header_title.svg",
+  "motif_zh": "粉雪",
+  "motif_en": "Powder snow",
+  "color": "#2f9a5a"
+ },
+ "liza": {
+  "file": "liza.svg",
+  "source_url": "https://www.zaoliza.co.jp/wntr/common/img/ft-logo01.png",
+  "motif_zh": "蔵王",
+  "motif_en": "Zao",
+  "color": "#a7000d"
+ },
+ "shiroishi": {
+  "file": "shiroishi.svg",
+  "source_url": "https://www.nposki.com/",
+  "motif_zh": "蔵王",
+  "motif_en": "Zao",
+  "color": "#30475e"
+ },
+ "sumikawa": {
+  "file": "sumikawa.svg",
+  "source_url": "https://www.zao-sumikawa.jp/cms/wp-content/themes/theme/assets/images/common/new-logo.png",
+  "motif_zh": "樹冰",
+  "motif_en": "Snow monsters",
+  "color": "#3d86c6"
+ },
+ "eboshi": {
+  "file": "eboshi.svg",
+  "source_url": "https://eboshi.co.jp/",
+  "motif_zh": "蔵王",
+  "motif_en": "Zao",
+  "color": "#d7001d"
+ }
+}
