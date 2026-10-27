@@ -1,0 +1,89 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="data.js"></script><title>大鰐溫泉 7 日天氣預報 · Owani Onsen</title>
+<style>
+:root{--bg:#eef4fa;--card:#fff;--ink:#14233a;--mut:#5d6b80;--acc:#1f6fd1;--snow:#7bb8ff}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"Noto Sans TC","Hiragino Sans","Microsoft JhengHei",sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(135deg,#10325e,#1f6fd1);color:#fff;padding:28px 20px 22px}
+.wrap{max-width:1160px;margin:0 auto}h1{margin:0;font-size:1.7rem}h1 small{display:block;font-size:.95rem;font-weight:400;opacity:.85;margin-top:4px}
+.meta{margin-top:12px;font-size:.88rem;opacity:.92;line-height:1.6}.meta a{color:#cfe3ff}
+main{padding:20px}.status{font-size:.85rem;color:var(--mut);margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:12px}
+.c{background:var(--card);border-radius:14px;padding:14px 8px;box-shadow:0 1px 4px rgba(20,35,58,.08);text-align:center}
+.d{font-weight:700}.dw{color:var(--mut);font-size:.8rem}.ic{font-size:2.1rem;margin:6px 0 2px}.cond{font-size:.86rem;min-height:2.2em}
+.t{font-size:1.25rem;margin:6px 0}.t .hi{color:#d1452f;font-weight:700}.t .lo{color:#2b6cc4;font-weight:700}
+.row{display:flex;justify-content:space-between;font-size:.76rem;border-top:1px solid #edf1f6;padding:4px 0}.row span:first-child{color:var(--mut)}
+.row span{white-space:nowrap}.row{gap:4px}.wd{display:inline-flex;align-items:center;gap:2px;vertical-align:middle}.wd svg{flex:none}
+@media(max-width:480px){main{padding:12px}.grid{gap:10px}}
+.swipehint{display:none;text-align:center;font-size:.75rem;color:var(--mut);margin:0 0 6px}
+@media(max-width:600px){.grid{display:flex!important;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px!important;-webkit-overflow-scrolling:touch;padding-bottom:8px;overscroll-behavior-x:contain}
+.grid>.c{flex:0 0 calc(50% - 5px);min-width:0;scroll-snap-align:start}.swipehint{display:block}}
+.c.past{background:#eef0f3}.c.past .ic,.c.past .t{opacity:.75}.c.today{background:#e6f6e9;box-shadow:0 0 0 2px #2e9e44}
+.tag{height:18px;margin:-4px 0 4px;font-size:.72rem;font-weight:700}.tag.past{color:#6b7686}.tag.today{color:#1d7a35}
+.c.past .row,.c.today .row{border-top-color:rgba(20,35,58,.09)}
+.snow{color:#1565c0;font-weight:700}.note{font-size:.82rem;color:var(--mut);line-height:1.65;margin-top:20px;background:#fff;border-radius:12px;padding:14px 16px}
+.note a{color:var(--acc)}
+.note summary{cursor:pointer;font-weight:700;color:var(--ink);font-size:.9rem;list-style:none;padding:4px 0;-webkit-tap-highlight-color:transparent;user-select:none}
+.note summary::-webkit-details-marker{display:none}.note summary::after{content:' ▸';color:var(--mut)}.note[open] summary::after{content:' ▾'}
+.note .nb{margin-top:6px}.note .fl{margin:4px 0 10px;padding-left:1.2em}.note .fl li{margin:2px 0}
+</style><style>html,body{background:transparent!important}main.wrap{padding:0!important;max-width:none!important}.note{margin-top:14px}.grid{gap:8px!important}.row{font-size:.74rem!important}</style><base target="_blank"></head><body data-wx="live">
+
+<main class="wrap">
+<p class="status" id="status">載入中…</p>
+<div class="swipehint">← 滑動查看更多 →</div>
+<div class="grid" id="grid"></div>
+<details class="note" id="info"><summary>資訊欄</summary><div class="nb" id="wxnb"></div></details>
+</main>
+<script>
+const R=new URLSearchParams(location.search).get("r")||"",W=(window.WXD||{})[R];
+if(W){document.title=W.title;document.getElementById("wxnb").innerHTML=W.note;document.body.dataset.wx=R}
+const SNAP=W?W.snap:null;
+const CFG=W?W.cfg:{lat:0,lon:0,elev_mid:0,timezone:"Asia/Tokyo"};
+const B=`https://api.open-meteo.com/v1/forecast?latitude=${CFG.lat}&longitude=${CFG.lon}&timezone=${encodeURIComponent(CFG.timezone)}&forecast_days=5&past_days=2`;
+// zone abbreviation (JST, NZDT/NZST, CET...): first locale that names it, else GMT+N
+const tzLabel=d=>{if(CFG.tz_label)return CFG.tz_label;let g='';for(const l of['en-US','en-GB','en-AU','ja-JP','en-CA','en-IN']){const v=new Intl.DateTimeFormat(l,{timeZone:CFG.timezone,timeZoneName:'short'}).formatToParts(d).find(x=>x.type=='timeZoneName').value;if(!/^(GMT|UTC)/.test(v))return v;g=g||v}return g};
+const MQ=m=>m&&m!=='best_match'?`&models=${m}`:'';
+const D='weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,snowfall_sum,wind_speed_10m_max,wind_direction_10m_dominant';
+const URLS={mid:`${B}&elevation=${CFG.elev_mid}${MQ(CFG.model)}&daily=${D}`,base:`${B}&elevation=${CFG.elev_base}${MQ(CFG.model)}&daily=temperature_2m_max,temperature_2m_min`,
+top:`${B}&elevation=${CFG.elev_top}${MQ(CFG.model)}&daily=temperature_2m_max,temperature_2m_min`,prob:`${B}&elevation=${CFG.elev_mid}${MQ(CFG.prob_model)}&daily=precipitation_probability_max,wind_gusts_10m_max`};
+const WMO={0:['☀️','晴'],1:['🌤️','大致晴'],2:['⛅','晴時多雲'],3:['☁️','陰'],45:['🌫️','霧'],48:['🌫️','霧凇'],51:['🌦️','毛毛雨（弱）'],53:['🌦️','毛毛雨'],55:['🌧️','毛毛雨（強）'],56:['🌧️','凍毛毛雨'],57:['🌧️','凍毛毛雨（強）'],
+61:['🌧️','小雨'],63:['🌧️','雨'],65:['🌧️','大雨'],66:['🌧️','凍雨'],67:['🌧️','凍雨（強）'],71:['🌨️','小雪'],73:['🌨️','雪'],75:['❄️','大雪'],77:['🌨️','雪粒'],80:['🌦️','陣雨'],81:['🌧️','陣雨'],82:['⛈️','強陣雨'],85:['🌨️','陣雪'],86:['❄️','強陣雪'],95:['⛈️','雷雨'],96:['⛈️','雷雨夾冰雹'],99:['⛈️','強雷雨夾冰雹']};
+const DIRS=['北','北北東','東北','東北東','東','東南東','東南','南南東','南','南南西','西南','西南西','西','西北西','西北','北北西'];
+const EN=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+const di=d=>Math.round(d/22.5)%16;
+const wcol=k=>k==null?'#ffffff':k<20?'#ffffff':k<40?'#2e9e44':k<60?'#f2c200':'#d93025';
+const arrow=(d,k)=>d==null?'—':`<span class="wd" title="風向 ${DIRS[di(d)]}（${Math.round(d)}°）· 最大風速 ${k==null?'—':Math.round(k)+' km/h'}"><svg width="17" height="17" viewBox="0 0 24 24" aria-label="${DIRS[di(d)]}" style="transform:rotate(${d}deg)"><path d="M12 2 L19 20 L12 16 L5 20 Z" fill="${wcol(k)}" stroke="#14233a" stroke-width="1.6" stroke-linejoin="round"/></svg></span>`;
+const precTxt=(a,pr)=>[a==null?null:f(a,' mm',1),pr==null?null:Math.round(pr)+'%'].filter(Boolean).join(' ')||'—';
+const r0=v=>v==null?'—':Math.round(v);
+const windTxt=(d,k,g)=>`${arrow(d,k)}${d==null?'':DIRS[di(d)]}${r0(k)}/${r0(g)}`;
+const f=(v,u='',p=0)=>{if(v==null)return'—';let x=(+v).toFixed(p);if(/^-0(\.0+)?$/.test(x))x=x.slice(1);return x+u};
+const N=7, TODAY=2;
+const TAGS=['前天','昨天'];
+const WD='日一二三四五六';
+function toToday(){const g=document.getElementById('grid'),c=g.children[TODAY];if(!c||!matchMedia('(max-width:600px)').matches)return;
+ const prev=g.style.scrollSnapType;g.style.scrollSnapType='none';g.scrollLeft=c.offsetLeft-g.offsetLeft;g.style.scrollSnapType=prev}
+addEventListener('load',()=>setTimeout(toToday,50));
+function render(s,live){
+ const m=s.mid.daily,b=s.base.daily,t=s.top.daily,p=s.prob.daily;
+ document.getElementById('grid').innerHTML=m.time.slice(0,N).map((d,i)=>{const w=WMO[m.weather_code[i]]||['❔','代碼 '+m.weather_code[i]];
+  const sn=m.snowfall_sum[i];
+  const k=i<TODAY?'past':i===TODAY?'today':'';
+  const tag=i<TODAY?TAGS[i]:i===TODAY?'今天':'';
+  return `<div class="c${k?' '+k:''}">${tag?`<div class="tag ${k}">${tag}</div>`:'<div class="tag"></div>'}<div class="d">${d.slice(5).replace('-','/').replace(/^0/,'').replace('/0','/')}</div><div class="dw">週${WD[new Date(d+'T12:00:00Z').getUTCDay()]}</div>
+  <div class="ic">${w[0]}</div><div class="cond">${w[1]}</div>
+  <div class="t"><span class="hi">${f(m.temperature_2m_max[i],'°')}</span> / <span class="lo">${f(m.temperature_2m_min[i],'°')}</span></div>
+  <div class="row"><span>山頂</span><span>${f(t.temperature_2m_max[i],'°')} / ${f(t.temperature_2m_min[i],'°')}</span></div>
+  <div class="row"><span>山麓</span><span>${f(b.temperature_2m_max[i],'°')} / ${f(b.temperature_2m_min[i],'°')}</span></div>
+  <div class="row"><span>降雨</span><span title="降雨 mm／降雨機率 %">${precTxt(m.precipitation_sum[i],p.precipitation_probability_max[i])}</span></div>
+  <div class="row"><span>降雪</span><span class="${sn>0?'snow':''}" title="降雪（預報）／積雪深：尚無資料">${f(sn,' cm',1)} / —</span></div>
+  <div class="row"><span>風</span><span title="風速／陣風 km/h">${windTxt(m.wind_direction_10m_dominant[i],m.wind_speed_10m_max[i],p.wind_gusts_10m_max[i])}</span></div></div>`}).join('');
+ requestAnimationFrame(()=>requestAnimationFrame(toToday));
+ document.getElementById('status').textContent=live?`即時資料 · 取得時間 ${s.fetched}（溫度單位 °C；中段 ${CFG.elev_mid.toLocaleString('en-US')} m 最高/最低）`:`⚠️ 無法連線取得即時資料，顯示內建快照 · 快照時間 ${s.fetched}`;
+}
+async function load(){
+ try{const e=await Promise.all(Object.entries(URLS).map(async([k,u])=>{const r=await fetch(u);if(!r.ok)throw new Error(r.status);const j=await r.json();if(!j.daily)throw new Error('no daily');return[k,j]}));
+  const s=Object.fromEntries(e);const n=new Date();s.fetched=n.toLocaleString('sv-SE',{timeZone:CFG.timezone}).slice(0,16)+' '+tzLabel(n);render(s,true);}
+ catch(err){console.warn(err);if(SNAP)render(SNAP,false);else document.getElementById('status').textContent='無法取得資料';}
+}
+if(W)load();else document.getElementById("status").textContent="找不到這個雪場的天氣設定";
+</script><script>(function(){function h(){try{parent.postMessage({wx:document.body.dataset.wx,h:Math.ceil(document.querySelector('main').getBoundingClientRect().bottom+4)},'*')}catch(e){}}
+addEventListener('load',h);if(window.ResizeObserver)new ResizeObserver(h).observe(document.documentElement);document.addEventListener('toggle',h,true);setTimeout(h,500);setTimeout(h,2500)})();</script></body></html>
