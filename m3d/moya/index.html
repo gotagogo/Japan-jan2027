@@ -1,0 +1,91 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moya Hills 3D 雪場圖</title><style>
+html,body{margin:0;height:100%;overflow:hidden;background:#cfe0ee;font-family:system-ui,"Noto Sans TC",sans-serif}
+#c{position:fixed;inset:0}#t{position:fixed;top:10px;left:12px;background:#fffd;padding:8px 12px;border-radius:8px;font-size:calc(13px*var(--fs,1));max-width:min(380px,38vw)}
+#t h1{font-size:calc(17px*var(--fs,1));margin:0 0 4px}.lg span{display:inline-block;width:18px;height:4px;margin:0 4px 3px 8px;vertical-align:middle}
+.lb{font-size:calc(12px*var(--fs,1));padding:2px 6px;border-radius:4px;background:#fffe;white-space:nowrap;pointer-events:none;border:1px solid #888}
+.lb.lift{background:#1d3f8fe8;color:#fff;border:0}.lb.old{background:#777c;color:#fff;border:0}
+#n{position:fixed;bottom:6px;left:10px;font-size:calc(11px*var(--fs,1));background:#fffc;padding:3px 8px;border-radius:5px}
+#t,#lang,#n{z-index:10}
+#t{top:10px!important;left:10px!important;max-width:min(400px,calc(100vw - 20px))!important}#hd{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;margin:0!important}#ind{display:inline-block;width:1em;color:#1d3f8f}
+#bd{margin-top:6px}#lang{text-align:left;margin-bottom:4px}#lang button{margin:2px 2px 0 0}#t.col #bd{display:none}
+@media (max-width:600px){#t h1{font-size:calc(14px*var(--fs,1))}.fn{font-size:calc(9.5px*var(--fs,1))}.fn[data-k=hint]{display:none}#n{font-size:calc(9px*var(--fs,1));left:4px;right:4px;bottom:4px}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head><body><div id="c"></div><style>#lang{text-align:right}#lang button{font-size:14px;padding:6px 10px;min-height:34px;margin-top:4px;margin-left:2px;border:1px solid #888;border-radius:5px;background:#fff}#lang button.on{background:#1d3f8f;color:#fff}.elev{background:#fffbe6;border-color:#c90;font-weight:600}.fn{font-size:calc(10.5px*var(--fs,1));color:#555;margin-top:3px}</style>
+<div id="t"><h1 id="hd"><span id="ind">▾</span> <span data-k="title"></span></h1><div id="bd"><div id="lang" ><button data-l="ja">日本語</button><button data-l="zh">中文</button><button data-l="en">English</button><br><button id="tl"></button><button id="fm">A−</button><button id="fp">A+</button></div><div class="lg"><span style="background:#2a2"></span><i data-k="g"></i><span style="background:#d22"></span><i data-k="r"></i><span style="background:#111"></span><i data-k="bk"></i><span style="background:#1d3f8f"></span><i data-k="lift"></i><span style="background:repeating-linear-gradient(90deg,#333 0 4px,transparent 4px 7px)"></span><i data-k="old"></i></div><div class="fn" data-k="elev"></div><div class="fn" data-k="dag"></div><div class="fn" data-k="hint"></div></div></div>
+<div id="n" data-k="src"></div>
+<script type="module">
+import * as THREE from 'three';import {OrbitControls} from 'three/addons/controls/OrbitControls.js';import {CSS2DRenderer,CSS2DObject} from 'three/addons/renderers/CSS2DRenderer.js';
+const W=140.786,S=40.724,E=140.806,N=40.742,EX=1.5,B0=200,n=256;
+const mx=(E-W)*111320*Math.cos((S+N)/2*Math.PI/180),mz=(N-S)*110950;
+const X=lon=>(lon-W)/(E-W)*mx-mx/2,Z=lat=>(N-lat)/(N-S)*mz-mz/2;
+const [buf,data]=await Promise.all([fetch('dem256.bin').then(r=>r.arrayBuffer()),fetch('data.json').then(r=>r.json())]);
+const H=new Uint16Array(buf);
+function h(lon,lat){let u=(lon-W)/(E-W)*(n-1),v=(N-lat)/(N-S)*(n-1);u=Math.max(0,Math.min(n-1.001,u));v=Math.max(0,Math.min(n-1.001,v));
+const i=u|0,j=v|0,fu=u-i,fv=v-j,g=(a,b)=>H[b*n+a]/10;return(g(i,j)*(1-fu)+g(i+1,j)*fu)*(1-fv)+(g(i,j+1)*(1-fu)+g(i+1,j+1)*fu)*fv}
+const T={ja:{title:'モヤヒルズ 3D ゲレンデマップ',g:'初級',r:'中級',bk:'上級',lift:'リフト',old:'廃止？',b1:'初心者',b2:'初・中級',b3:'中・上級',b4:'上級・非圧雪',top:'山頂 約518m',base:'ベース 約241m',vd:'標高差 約278m',
+elev:'標高はDEM5A実測の概算（山頂 約518m／ベース 約241m／標高差 約278m）。公式サイトは標高非公表。他サイト：skiaomori.com 512/237m、snoway.jp 520/240m',dag:'名称は公式サイト（moyahills.jp）の日本語表記。',show:'名称を表示',hide:'名称を隠す',hint:'ドラッグで左右回転・ホイール／ピンチでズーム',src:'地形：国土地理院 DEM5A／航空写真：国土地理院／リフト・コース：OpenStreetMap（名称の対応は推定）'},
+zh:{title:'Moya Hills 3D 雪場圖',g:'初級',r:'中級',bk:'上級',lift:'纜車',old:'停用？',b1:'初學者',b2:'初・中級',b3:'中・上級',b4:'上級・未壓雪',top:'山頂 約518m',base:'山腳 約241m',vd:'落差 約278m',
+elev:'海拔為 DEM5A 實測約略值（山頂約518m／山腳約241m／落差約278m）。官網未公布海拔；其他網站：skiaomori.com 512/237m、snoway.jp 520/240m',dag:'† 非官方名稱：官網只有日文，中文為自譯。',show:'顯示名稱',hide:'隱藏名稱',hint:'拖動左右旋轉・滾輪／雙指縮放',src:'地形：國土地理院 DEM5A；衛星圖：國土地理院；纜車／雪道：OpenStreetMap，名稱對照為推估'},
+en:{title:'Moya Hills 3D Trail Map',g:'Beginner',r:'Intermediate',bk:'Advanced',lift:'Lift',old:'Disused?',b1:'beginner',b2:'beginner–intermediate',b3:'intermediate–advanced',b4:'advanced, ungroomed',top:'Summit approx. 518 m',base:'Base approx. 241 m',vd:'Vertical approx. 278 m',
+elev:'Elevations are approximate, measured from GSI DEM5A (summit ~518 m / base ~241 m / vertical ~278 m). The official site does not publish elevations; other sites: skiaomori.com 512/237 m, snoway.jp 520/240 m.',dag:'† Unofficial name: the official site is Japanese-only; English is our own translation.',show:'Show names',hide:'Hide names',hint:'Drag to rotate left/right · scroll or pinch to zoom',src:'Terrain: GSI DEM5A · Imagery: GSI · Lifts/courses: OpenStreetMap (name matching estimated)'}};
+const LB=[];let lang=new URLSearchParams(location.search).get('lang')||localStorage.getItem('moyaLang')||'zh';if(!T[lang])lang='zh';
+function setLang(l){lang=l;localStorage.setItem('moyaLang',l);const u=new URL(location);u.searchParams.set('lang',l);history.replaceState(null,'',u);document.documentElement.lang={ja:'ja',zh:'zh-Hant',en:'en'}[l];
+document.title=T[l].title;document.querySelectorAll('[data-k]').forEach(e=>e.textContent=T[l][e.dataset.k]);LB.forEach(([d,f])=>d.textContent=f(l));document.getElementById('tl').textContent=T[l][showL?'hide':'show'];document.querySelectorAll('#lang button[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l==l))}
+const FS=[0.8,1,1.25,1.5];let fi=+(localStorage.getItem('moyaFs')??1);if(!(fi>=0&&fi<4))fi=1;let showL=localStorage.getItem('moyaLabels')==='1';
+function applyUI(){document.documentElement.style.setProperty('--fs',FS[fi]);localStorage.setItem('moyaFs',fi);localStorage.setItem('moyaLabels',showL?'1':'0');LB.forEach(([d])=>{if(!d.classList.contains('elev'))d.style.visibility=showL?'':'hidden'});fm.disabled=fi==0;fp.disabled=fi==3;document.getElementById('tl').textContent=T[lang][showL?'hide':'show']}
+const fm=document.getElementById('fm'),fp=document.getElementById('fp');fm.onclick=()=>{fi=Math.max(0,fi-1);applyUI()};fp.onclick=()=>{fi=Math.min(3,fi+1);applyUI()};document.getElementById('tl').onclick=()=>{showL=!showL;applyUI()};
+document.querySelectorAll('#lang button[data-l]').forEach(b=>b.onclick=()=>setLang(b.dataset.l));
+const Y=e=>(e-B0)*EX;
+const scene=new THREE.Scene();scene.background=new THREE.Color(0xcfe0ee);scene.fog=new THREE.Fog(0xcfe0ee,2500,5000);
+const cam=new THREE.PerspectiveCamera(40,innerWidth/innerHeight,5,10000);
+const ren=new THREE.WebGLRenderer({antialias:true});ren.setPixelRatio(Math.min(devicePixelRatio,2));ren.setSize(innerWidth,innerHeight);document.getElementById('c').appendChild(ren.domElement);
+const lr=new CSS2DRenderer();lr.setSize(innerWidth,innerHeight);Object.assign(lr.domElement.style,{position:'fixed',top:0,left:0,zIndex:1,pointerEvents:'none'});document.body.appendChild(lr.domElement);
+const geo=new THREE.PlaneGeometry(mx,mz,n-1,n-1);geo.rotateX(-Math.PI/2);const p=geo.attributes.position;
+for(let k=0;k<p.count;k++)p.setY(k,Y(H[k]/10));geo.computeVertexNormals();
+const tex=new THREE.TextureLoader().load('sat.jpg');tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=8;
+scene.add(new THREE.Mesh(geo,new THREE.MeshLambertMaterial({map:tex})));
+scene.add(new THREE.HemisphereLight(0xffffff,0x667755,1.6));const sun=new THREE.DirectionalLight(0xffffff,1.6);sun.position.set(-800,1200,-600);scene.add(sun);
+function label(f,cls,pos){const d=document.createElement('div');d.className='lb '+cls;LB.push([d,f]);const o=new CSS2DObject(d);o.position.copy(pos);scene.add(o)}
+function drape(c,off){const pts=[];for(let i=0;i<c.length-1;i++){const [a,b]=[c[i],c[i+1]];const L=Math.hypot(X(b[0])-X(a[0]),Z(b[1])-Z(a[1]));const s=Math.max(1,Math.ceil(L/8));
+for(let t=0;t<s;t++){const lo=a[0]+(b[0]-a[0])*t/s,la=a[1]+(b[1]-a[1])*t/s;pts.push(new THREE.Vector3(X(lo),Y(h(lo,la))+off,Z(la)))}}
+const l=c.at(-1);pts.push(new THREE.Vector3(X(l[0]),Y(h(l[0],l[1]))+off,Z(l[1])));return pts}
+function tube(pts,col,r){return new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),pts.length*2,r,6),new THREE.MeshBasicMaterial({color:col}))}
+const DC={g:0x22aa22,r:0xdd2222,b:0x111111};
+for(const c of data.courses){const pts=drape(c.c,3);scene.add(tube(pts,DC[c.d],3.2));if(c.label)label(l=>c.label[l]+'（'+T[l][c.label.dk]+'）','',pts[Math.floor(pts.length*0.45)].clone().add(new THREE.Vector3(0,10,0)))}
+for(const b of data.boundary){const pts=drape(b,2);scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.45})))}
+for(const L of data.lifts){const off=14,c=L.c,pts=c.map(q=>new THREE.Vector3(X(q[0]),Y(h(q[0],q[1]))+off,Z(q[1])));const off_=!L.no;
+if(off_){const dp=drape(c,22);pts.splice(0,pts.length,...dp);const cv=new THREE.CurvePath();for(let i=0;i<pts.length-1;i++)cv.add(new THREE.LineCurve3(pts[i],pts[i+1]));const len=cv.getLength(),k=Math.floor(len/12);for(let i=0;i<k;i+=2)scene.add(tube([cv.getPointAt(i/k),cv.getPointAt((i+1)/k)],0x333333,3))}
+else{for(let i=0;i<pts.length-1;i++)scene.add(tube([pts[i],pts[i+1]],0x1d3f8f,1.6));
+const tg=new THREE.SphereGeometry(3.5,8,6),tm=new THREE.MeshBasicMaterial({color:0x1d3f8f});pts.slice(1,-1).forEach(q=>{const m=new THREE.Mesh(tg,tm);m.position.copy(q);scene.add(m)});
+const sg=new THREE.BoxGeometry(14,10,14),sm=new THREE.MeshLambertMaterial({color:0xffcc00});[pts[0],pts.at(-1)].forEach(q=>{const m=new THREE.Mesh(sg,sm);m.position.copy(q).y-=off-5;scene.add(m)})}
+const mid=pts[Math.floor(pts.length/2)].clone().add(new THREE.Vector3(0,18,0));label(l=>L.label[l],off_?'old':'lift',mid)}
+{const a=data.lifts.find(x=>x.no=='3').c.at(-1),q=data.lifts.find(x=>x.no=='1').c[0];
+label(l=>'▲ '+T[l].top,'elev',new THREE.Vector3(X(a[0]),Y(h(a[0],a[1]))+45,Z(a[1])));label(l=>'● '+T[l].base+' ｜ '+T[l].vd,'elev',new THREE.Vector3(X(q[0]),Y(h(q[0],q[1]))+40,Z(q[1])));}
+setLang(lang);applyUI();
+{const t=document.getElementById('t'),st=localStorage.getItem('moyaBox');let col=true;
+const ap=()=>{t.classList.toggle('col',col);document.getElementById('ind').textContent=col?'▸':'▾';localStorage.setItem('moyaBox',col?'col':'full')};ap();
+document.getElementById('hd').onclick=()=>{col=!col;ap()};}
+const tgt=new THREE.Vector3(X(140.7963),Y(330),Z(40.7335));
+{const k=innerWidth/innerHeight<0.8?1.7:1;cam.position.set(tgt.x,tgt.y+650*k,tgt.z-1150*k);}
+const ctl=new OrbitControls(cam,lr.domElement);lr.domElement.style.pointerEvents='auto';lr.domElement.style.touchAction='none';ctl.target.copy(tgt);
+ctl.enableDamping=true;ctl.enablePan=true;ctl.screenSpacePanning=false;ctl.keyPanSpeed=25;ctl.listenToKeyEvents(window);const a=35*Math.PI/180;ctl.minAzimuthAngle=Math.PI-a;ctl.maxAzimuthAngle=Math.PI+a;
+ctl.minPolarAngle=0.65;ctl.maxPolarAngle=1.25;ctl.minDistance=500;ctl.maxDistance=2600;ctl.update();ctl.saveState();
+const BX=mx/2,BZ=mz/2;function clampT(){const t=ctl.target,cx=Math.max(-BX,Math.min(BX,t.x)),cz=Math.max(-BZ,Math.min(BZ,t.z)),dx=cx-t.x,dz=cz-t.z;if(dx||dz){t.x+=dx;t.z+=dz;cam.position.x+=dx;cam.position.z+=dz}}
+function moveG(f,r){const d=cam.position.distanceTo(ctl.target),st=Math.max(8,d*0.012);const fw=new THREE.Vector3().subVectors(ctl.target,cam.position);fw.y=0;if(fw.lengthSq()<1e-6)return;fw.normalize();const rt=new THREE.Vector3(-fw.z,0,fw.x);const m=fw.multiplyScalar(f*st).add(rt.multiplyScalar(r*st));ctl.target.add(m);cam.position.add(m);clampT()}
+{const pad=document.getElementById('pad');let hold=null;const stop=()=>{hold=null};
+pad.querySelectorAll('button[data-m]').forEach(b=>{const [f,r]=b.dataset.m.split(',').map(Number);b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture&&b.setPointerCapture(e.pointerId);hold=[f,r];moveG(f,r)});['pointerup','pointercancel','lostpointercapture','pointerleave'].forEach(ev=>b.addEventListener(ev,stop));b.addEventListener('contextmenu',e=>e.preventDefault())});
+document.getElementById('rst').onclick=()=>{hold=null;ctl.enableDamping=false;ctl.update();ctl.reset();ctl.enableDamping=true};addEventListener('blur',stop);
+(function hl(){requestAnimationFrame(hl);if(hold)moveG(hold[0],hold[1])})();}
+window.__cam=cam;window.__BXZ=[BX,BZ];
+addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();ren.setSize(innerWidth,innerHeight);lr.setSize(innerWidth,innerHeight)});
+window.__ctl=ctl;(function f(){requestAnimationFrame(f);ctl.update();clampT();ren.render(scene,cam);lr.render(scene,cam)})();window.__ready=1;
+</script><a id="home" href="../" style="position:fixed;top:10px;right:10px;z-index:20;background:#1d3f8f;color:#fff;text-decoration:none;font:600 14px system-ui,sans-serif;padding:8px 14px;border-radius:20px;box-shadow:0 2px 6px #0004">⌂ <span id="homet">回首頁</span></a><script>(function(){var h=document.getElementById("home");if(!h)return;var q=new URLSearchParams(location.search);if(q.get("embed")==="1"||window.top!==window.self){h.style.display="none";return;}var b=q.get("back");if(!b)return;try{var u=new URL(b);if(u.protocol!=="https:"||!/(^|\.)ship\.place$|^gotagogo\.github\.io$/.test(u.hostname))return;var a=h.cloneNode(false);a.id="backday";a.removeAttribute("target");a.href=u.href;a.textContent=/\/maps3d\.html$/.test(u.pathname)?"\u2190 返回3D雪場地圖":"\u2190 返回當天行程";h.parentNode.insertBefore(a,h);h.style.display="none";}catch(e){}})();</script>
+<script>(()=>{const H={ja:'ホームへ',zh:'回首頁','zh-Hant':'回首頁',en:'Home'},u=()=>{const l=document.documentElement.lang||'zh';document.getElementById('homet').textContent=H[l]||H.zh;const q=new URLSearchParams(location.search).get('lang');document.getElementById('home').href='../'+(q?'?lang='+q:'')};u();new MutationObserver(u).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});addEventListener('popstate',u);const pos=()=>{const h=document.getElementById('home'),n=document.getElementById('n'),m=innerWidth<=600;if(m){h.style.top='auto';h.style.bottom=Math.max((n?n.offsetHeight:0)+12,66)+'px';h.style.right='8px'}else{h.style.top='10px';h.style.bottom='auto';h.style.right='10px'}};pos();addEventListener("resize",pos);setInterval(pos,500);setInterval(u,1000)})()</script>
+<style>#pad{position:fixed;right:12px;bottom:80px;z-index:18;display:grid;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,44px);gap:4px;user-select:none;-webkit-user-select:none;touch-action:none}
+#pad button{width:44px;height:44px;border:1px solid #fff8;border-radius:50%;background:#1d3f8fd9;color:#fff;font:700 18px system-ui,sans-serif;box-shadow:0 2px 6px #0004;touch-action:none;-webkit-tap-highlight-color:transparent;padding:0;cursor:pointer}
+#pad button:active{background:#0e2a6b}#pad #rst{background:#fffe;color:#1d3f8f;font-size:12px;border-color:#1d3f8f66}@media(max-width:600px){#pad{grid-template-columns:repeat(3,40px);grid-template-rows:repeat(3,40px)}#pad button{width:40px;height:40px}}</style>
+<div id="pad" aria-label="平移地圖"><span></span><button data-m="1,0" title="往前" aria-label="往前">▲</button><span></span><button data-m="0,-1" title="往左" aria-label="往左">◀</button><button id="rst" title="重設視角" aria-label="重設視角">重設</button><button data-m="0,1" title="往右" aria-label="往右">▶</button><span></span><button data-m="-1,0" title="往後" aria-label="往後">▼</button><span></span></div>
+<script>(()=>{const pd=document.getElementById('pad'),rs=document.getElementById('rst'),RL={ja:'リセット',en:'Reset'};const pos=()=>{const n=document.getElementById('n'),m=innerWidth<=600,nh=n?n.offsetHeight:0;let b=Math.max(nh+16,80);if(m){const h=document.getElementById('home');if(h&&getComputedStyle(h).display!=='none'&&h.style.bottom&&h.style.bottom!=='auto')b=Math.max(b,parseFloat(h.style.bottom)+h.offsetHeight+10)}pd.style.bottom=b+'px';rs.textContent=RL[(document.documentElement.lang||'').slice(0,2)]||'重設'};pos();addEventListener('resize',pos);setInterval(pos,500)})()</script>
+<div id="vtag" style="position:fixed;top:48px;right:12px;z-index:19;font:500 10px system-ui,sans-serif;color:#fff;background:#0007;padding:2px 7px;border-radius:9px;pointer-events:none;white-space:nowrap">v 3DMap-0009 · 2026-10-27</div></body></html>

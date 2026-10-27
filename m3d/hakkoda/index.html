@@ -1,0 +1,113 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>八甲田滑雪場（八甲田纜車）3D 雪場圖（非官方）</title><style>
+html,body{margin:0;height:100%;overflow:hidden;background:#cfe0ee;font-family:system-ui,"Noto Sans TC",sans-serif}
+#c{position:fixed;inset:0}#t{position:fixed;top:10px;left:12px;background:#fffd;padding:8px 12px;border-radius:8px;font-size:calc(13px*var(--fs,1));max-width:min(380px,38vw)}
+#t h1{font-size:calc(17px*var(--fs,1));margin:0 0 4px}.zlg{font-weight:normal}.lg span{display:inline-block;width:18px;height:4px;margin:0 4px 3px 8px;vertical-align:middle}
+.lb{font-size:calc(12px*var(--fs,1));padding:2px 6px;border-radius:4px;background:#fffe;white-space:nowrap;pointer-events:none;border:1px solid #888}
+.lb.lift{background:#1d3f8fe8;color:#fff;border:0}.lb.old{background:#777c;color:#fff;border:0}
+#n{position:fixed;bottom:6px;left:10px;font-size:calc(11px*var(--fs,1));background:#fffc;padding:3px 8px;border-radius:5px}
+#t,#lang,#n{z-index:10}
+#t{top:10px!important;left:10px!important;max-width:min(400px,calc(100vw - 20px))!important}#hd{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;margin:0!important}#ind{display:inline-block;width:1em;color:#1d3f8f}
+#bd{margin-top:6px}#lang{text-align:left;margin-bottom:4px}#lang button{margin:2px 2px 0 0}#t.col #bd{display:none}
+@media (max-width:600px){#t h1{font-size:calc(14px*var(--fs,1))}.fn{font-size:calc(9.5px*var(--fs,1))}.fn[data-k=hint]{display:none}#n{font-size:calc(9px*var(--fs,1));left:4px;right:4px;bottom:4px}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head><body><div id="c"></div><style>#lang{text-align:right}#lang button{font-size:14px;padding:6px 10px;min-height:34px;margin-top:4px;margin-left:2px;border:1px solid #888;border-radius:5px;background:#fff}#lang button.on{background:#1d3f8f;color:#fff}.elev{background:#fffbe6;border-color:#c90;font-weight:600}.fn{font-size:calc(10.5px*var(--fs,1));color:#555;margin-top:3px}</style>
+<div id="t"><h1 id="hd"><span id="ind">▾</span> <span data-k="title"></span></h1><div id="bd"><div id="lang" ><button data-l="ja">日本語</button><button data-l="zh">中文</button><button data-l="en">English</button><br><button id="tl"></button><button id="fm">A−</button><button id="fp">A+</button><button id="zb"></button></div><div class="lg"><span style="background:#2a2"></span><i data-k="g"></i><span style="background:#d22"></span><i data-k="r"></i><span style="background:#111"></span><i data-k="bk"></i><span style="background:#1d3f8f"></span><i data-k="lift"></i><b class="zlg" data-z="tr"><span style="background:#1fb5a5aa"></span><i data-k="tr"></i></b><b class="zlg" data-z="pw"><span style="background:#b48cf0aa"></span><i data-k="pw"></i></b><b class="zlg" data-z="pk"><span style="background:#ff9a1faa"></span><i data-k="pk"></i></b></div><div class="fn" data-k="elev"></div><div class="fn" data-k="dag"></div><div class="fn" data-k="ng2" style="color:#a40000"></div><div class="fn" data-k="hint"></div></div></div>
+<div id="n" data-k="src"></div>
+<script type="module">
+import * as THREE from 'three';import {OrbitControls} from 'three/addons/controls/OrbitControls.js';import {CSS2DRenderer,CSS2DObject} from 'three/addons/renderers/CSS2DRenderer.js';
+const [buf,data]=await Promise.all([fetch('dem256.bin').then(r=>r.arrayBuffer()),fetch('data.json').then(r=>r.json())]);const CF=data.cfg;const [W,S,E,N]=CF.bbox,EX=1.5,B0=CF.b0,n=256;
+const mx=(E-W)*111320*Math.cos((S+N)/2*Math.PI/180),mz=(N-S)*110950;
+const X=lon=>(lon-W)/(E-W)*mx-mx/2,Z=lat=>(N-lat)/(N-S)*mz-mz/2;
+const H=new Uint16Array(buf);
+function h(lon,lat){let u=(lon-W)/(E-W)*(n-1),v=(N-lat)/(N-S)*(n-1);u=Math.max(0,Math.min(n-1.001,u));v=Math.max(0,Math.min(n-1.001,v));
+const i=u|0,j=v|0,fu=u-i,fv=v-j,g=(a,b)=>H[b*n+a]/10;return(g(i,j)*(1-fu)+g(i+1,j)*fu)*(1-fv)+(g(i,j+1)*(1-fu)+g(i+1,j+1)*fu)*fv}
+const T=data.T;
+const LB=[];let lang=new URLSearchParams(location.search).get('lang')||localStorage.getItem(CF.key+'Lang')||'zh';if(!T[lang])lang='zh';
+function setLang(l){lang=l;localStorage.setItem(CF.key+'Lang',l);const u=new URL(location);u.searchParams.set('lang',l);history.replaceState(null,'',u);document.documentElement.lang={ja:'ja',zh:'zh-Hant',en:'en'}[l];
+document.title=T[l].title;document.querySelectorAll('[data-k]').forEach(e=>e.textContent=T[l][e.dataset.k]);LB.forEach(([d,f])=>d.textContent=f(l));document.getElementById('tl').textContent=T[l][showL?'hide':'show'];document.querySelectorAll('#lang button[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l==l))}
+const FS=[0.8,1,1.25,1.5];let fi=+(localStorage.getItem(CF.key+'Fs')??1);if(!(fi>=0&&fi<4))fi=1;let showL=localStorage.getItem(CF.key+'Labels')==='1';
+function applyUI(){document.documentElement.style.setProperty('--fs',FS[fi]);localStorage.setItem(CF.key+'Fs',fi);localStorage.setItem(CF.key+'Labels',showL?'1':'0');LB.forEach(([d])=>{if(!d.classList.contains('elev'))d.style.visibility=showL?'':'hidden'});fm.disabled=fi==0;fp.disabled=fi==3;document.getElementById('tl').textContent=T[lang][showL?'hide':'show'];zb.textContent=T[lang][showZ?'zon':'zoff'];ZG.visible=showZ;ZL.forEach(([d,o])=>{o.visible=showZ;d.style.visibility=showL?'':'hidden'});localStorage.setItem(CF.key+'Zones',showZ?'1':'0')}
+const fm=document.getElementById('fm'),fp=document.getElementById('fp');fm.onclick=()=>{fi=Math.max(0,fi-1);applyUI()};fp.onclick=()=>{fi=Math.min(3,fi+1);applyUI()};document.getElementById('tl').onclick=()=>{showL=!showL;applyUI()};
+document.querySelectorAll('#lang button[data-l]').forEach(b=>b.onclick=()=>setLang(b.dataset.l));
+const ZG=new THREE.Group(),ZL=[];let showZ=localStorage.getItem(CF.key+'Zones')!=='0';const zb=document.getElementById('zb');zb.onclick=()=>{showZ=!showZ;applyUI()};
+const Y=e=>(e-B0)*EX;
+const scene=new THREE.Scene();scene.background=new THREE.Color(0xcfe0ee);scene.fog=new THREE.Fog(0xcfe0ee,4000,9000);
+const cam=new THREE.PerspectiveCamera(40,innerWidth/innerHeight,5,20000);
+const ren=new THREE.WebGLRenderer({antialias:true});ren.setPixelRatio(Math.min(devicePixelRatio,2));ren.setSize(innerWidth,innerHeight);document.getElementById('c').appendChild(ren.domElement);
+const lr=new CSS2DRenderer();lr.setSize(innerWidth,innerHeight);Object.assign(lr.domElement.style,{position:'fixed',top:0,left:0,zIndex:1,pointerEvents:'none'});document.body.appendChild(lr.domElement);
+const geo=new THREE.PlaneGeometry(mx,mz,n-1,n-1);geo.rotateX(-Math.PI/2);const p=geo.attributes.position;
+for(let k=0;k<p.count;k++)p.setY(k,Y(H[k]/10));geo.computeVertexNormals();
+const tex=new THREE.TextureLoader().load('sat.jpg');tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=8;
+scene.add(new THREE.Mesh(geo,new THREE.MeshLambertMaterial({map:tex})));
+scene.add(new THREE.HemisphereLight(0xffffff,0x667755,1.6));const sun=new THREE.DirectionalLight(0xffffff,1.6);sun.position.set(-800,1200,-600);scene.add(sun);
+function label(f,cls,pos){const d=document.createElement('div');d.className='lb '+cls;LB.push([d,f]);const o=new CSS2DObject(d);o.position.copy(pos);scene.add(o)}
+function drape(c,off){const pts=[];for(let i=0;i<c.length-1;i++){const [a,b]=[c[i],c[i+1]];const L=Math.hypot(X(b[0])-X(a[0]),Z(b[1])-Z(a[1]));const s=Math.max(1,Math.ceil(L/8));
+for(let t=0;t<s;t++){const lo=a[0]+(b[0]-a[0])*t/s,la=a[1]+(b[1]-a[1])*t/s;pts.push(new THREE.Vector3(X(lo),Y(h(lo,la))+off,Z(la)))}}
+const l=c.at(-1);pts.push(new THREE.Vector3(X(l[0]),Y(h(l[0],l[1]))+off,Z(l[1])));return pts}
+function tube(pts,col,r){return new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),pts.length*2,r,6),new THREE.MeshBasicMaterial({color:col}))}
+const DC={g:0x22aa22,r:0xdd2222,b:0x111111};
+for(const c of data.courses){const pts=drape(c.c,c.d=='g'?3:4.5);scene.add(tube(pts,DC[c.d],3.2));if(c.label)label(l=>c.label[l]+'（'+T[l][c.label.dk]+'）','',pts[Math.floor(pts.length*(c.d=='g'?0.3:0.62))].clone().add(new THREE.Vector3(0,10,0)))}
+for(const b of data.boundary){const pts=drape(b,2);scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.45})))}
+for(const L of data.lifts){const off=14,c=L.c,pts=c.map(q=>new THREE.Vector3(X(q[0]),Y(h(q[0],q[1]))+off,Z(q[1])));const off_=!L.no;
+if(off_){const dp=drape(c,22);pts.splice(0,pts.length,...dp);const cv=new THREE.CurvePath();for(let i=0;i<pts.length-1;i++)cv.add(new THREE.LineCurve3(pts[i],pts[i+1]));const len=cv.getLength(),k=Math.floor(len/12);for(let i=0;i<k;i+=2)scene.add(tube([cv.getPointAt(i/k),cv.getPointAt((i+1)/k)],0x333333,3))}
+else{for(let i=0;i<pts.length-1;i++)scene.add(tube([pts[i],pts[i+1]],0x1d3f8f,1.6));
+const tg=new THREE.SphereGeometry(3.5,8,6),tm=new THREE.MeshBasicMaterial({color:0x1d3f8f});pts.slice(1,-1).forEach(q=>{const m=new THREE.Mesh(tg,tm);m.position.copy(q);scene.add(m)});
+const sg=new THREE.BoxGeometry(14,10,14),sm=new THREE.MeshLambertMaterial({color:0xffcc00});[pts[0],pts.at(-1)].forEach(q=>{const m=new THREE.Mesh(sg,sm);m.position.copy(q).y-=off-5;scene.add(m)})}
+const mid=pts[Math.floor(pts.length/2)].clone().add(new THREE.Vector3(0,18,0));label(l=>L.label[l],off_?'old':'lift',mid)}
+{const a=CF.top,q=CF.base;
+label(l=>'▲ '+T[l].top,'elev',new THREE.Vector3(X(a[0]),Y(h(a[0],a[1]))+45,Z(a[1])));label(l=>'● '+T[l].base+' ｜ '+T[l].vd,'elev',new THREE.Vector3(X(q[0]),Y(h(q[0],q[1]))+40,Z(q[1])));}
+scene.add(ZG);const ZC={tr:[31,181,165],pw:[180,140,240],pk:[255,154,31]};
+for(const z of (data.zones||[])){const pts=z.p;const cx=pts.reduce((a,p)=>a+p[0],0)/pts.length,cy=pts.reduce((a,p)=>a+p[1],0)/pts.length;
+const sh=new THREE.Shape(pts.map(p=>new THREE.Vector2(X(p[0]),-Z(p[1]))));const g=new THREE.ShapeGeometry(sh);g.rotateX(-Math.PI/2);
+const pa=g.attributes.position;const sub=g.toNonIndexed();const q=sub.attributes.position;
+for(let k=0;k<q.count;k++){}
+const tg=new THREE.ShapeGeometry(sh,1);
+const v=[];const ix=g.index.array;const P2=pa;const M=6;
+for(let t=0;t<ix.length;t+=3){const A=[0,1,2].map(m=>[P2.getX(ix[t+m]),P2.getZ(ix[t+m])]);
+for(let u=0;u<M;u++)for(let w=0;w<M-u;w++){const tri=[[u,w],[u+1,w],[u,w+1]];if(w<M-u-1)tri.push([u+1,w],[u+1,w+1],[u,w+1]);
+for(const [uu,ww] of tri){const a=(M-uu-ww)/M,b=uu/M,c=ww/M;const x=A[0][0]*a+A[1][0]*b+A[2][0]*c,zz=A[0][1]*a+A[1][1]*b+A[2][1]*c;
+const lo=W+(x+mx/2)/mx*(E-W),la=N-(zz+mz/2)/mz*(N-S);v.push(x,Y(h(lo,la))+3.5,zz)}}}
+const gg=new THREE.BufferGeometry();gg.setAttribute('position',new THREE.Float32BufferAttribute(v,3));const c=ZC[z.t];
+ZG.add(new THREE.Mesh(gg,new THREE.MeshBasicMaterial({color:new THREE.Color(`rgb(${c})`),transparent:true,opacity:.6,depthWrite:false,side:THREE.DoubleSide})));
+ZG.add(tube(drape([...pts,pts[0]],4),new THREE.Color(`rgb(${c})`),1.2));
+const lb=document.createElement('div');lb.className='lb elev';lb.style.cssText=`background:rgba(${c},.9);color:#fff;border:0`;LB.push([lb,l=>(z.n?z.n[l]:T[l][z.t])+'（'+T[l].zest+'）']);const o=new CSS2DObject(lb);ZL.push([lb,o]);o.position.set(X(cx),Y(h(cx,cy))+20,Z(cy));ZG.add(o);}
+{const zt=new Set((data.zones||[]).map(z=>z.t));document.querySelectorAll('.zlg').forEach(e=>{if(!zt.has(e.dataset.z))e.remove()});if(!zt.size)zb.style.display='none';if((data.nogo||[]).length){const lg=document.querySelector('.lg');lg.insertAdjacentHTML('beforeend','<b class="zlg"><span style="background:#e33a"></span><i data-k="nogoL"></i></b>')}}
+setLang(lang);applyUI();
+{const t=document.getElementById('t'),st=localStorage.getItem(CF.key+'Box');let col=true;
+const ap=()=>{t.classList.toggle('col',col);document.getElementById('ind').textContent=col?'▸':'▾';localStorage.setItem(CF.key+'Box',col?'col':'full')};ap();
+document.getElementById('hd').onclick=()=>{col=!col;ap()};}
+for(const pg of (data.nogo||[])){const pts=pg,ring=[...pg,pg[0]];
+const cx=pts.reduce((a,p)=>a+p[0],0)/pts.length,cy=pts.reduce((a,p)=>a+p[1],0)/pts.length;
+const g=new THREE.BufferGeometry();const v=[];const M=12;
+for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length];const f=(t)=>{const lo=cx*t[0]+a[0]*t[1]+b[0]*t[2],la=cy*t[0]+a[1]*t[1]+b[1]*t[2];v.push(X(lo),Y(h(lo,la))+2.5,Z(la))};const t=(uu,ww)=>[(M-uu-ww)/M,uu/M,ww/M];
+for(let u=0;u<M;u++)for(let w=0;w<M-u;w++){f(t(u,w));f(t(u+1,w));f(t(u,w+1));if(w<M-u-1){f(t(u+1,w));f(t(u+1,w+1));f(t(u,w+1))}}}
+g.setAttribute('position',new THREE.Float32BufferAttribute(v,3));const uv=[];for(let i=0;i<v.length;i+=3)uv.push(v[i]/12,v[i+2]/12);g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));
+const cv=document.createElement('canvas');cv.width=cv.height=64;const c2=cv.getContext('2d');c2.fillStyle='rgba(255,40,40,0.35)';c2.fillRect(0,0,64,64);c2.strokeStyle='rgba(220,0,0,0.9)';c2.lineWidth=6;for(let k=-64;k<128;k+=16){c2.beginPath();c2.moveTo(k,64);c2.lineTo(k+64,0);c2.stroke()}
+const tx=new THREE.CanvasTexture(cv);tx.wrapS=tx.wrapT=THREE.RepeatWrapping;
+scene.add(new THREE.Mesh(g,new THREE.MeshBasicMaterial({map:tx,transparent:true,depthWrite:false,side:THREE.DoubleSide})));
+scene.add(tube(drape(ring,3),0xdd0000,1.2));
+const lb=document.createElement('div');lb.className='lb elev';lb.style.cssText='background:#d00e;color:#fff;border:0';lb.textContent='⛔ '+T[lang].nogoL;LB.push([lb,l=>'⛔ '+T[l].nogoL]);const o=new CSS2DObject(lb);o.position.set(X(cx),Y(h(cx,cy))+25,Z(cy));scene.add(o);}
+const tgt=new THREE.Vector3(X(CF.tgt[0]),Y(CF.tgt[2]),Z(CF.tgt[1]));const sm=CF.top,bs=CF.base;const SC=Math.max(mx,mz)/2600;const dv=new THREE.Vector2(X(bs[0])-X(sm[0]),Z(bs[1])-Z(sm[1])).normalize();const AZ=Math.atan2(dv.x,dv.y);
+{const k=innerWidth/innerHeight<0.8?2.2:2.0;cam.position.set(tgt.x+dv.x*1500*k*SC,tgt.y+850*k*SC,tgt.z+dv.y*1500*k*SC);}
+const ctl=new OrbitControls(cam,lr.domElement);lr.domElement.style.pointerEvents='auto';lr.domElement.style.touchAction='none';ctl.target.copy(tgt);
+ctl.enableDamping=true;ctl.enablePan=true;ctl.screenSpacePanning=false;ctl.keyPanSpeed=25;ctl.listenToKeyEvents(window);const a=35*Math.PI/180;ctl.minAzimuthAngle=AZ-a;ctl.maxAzimuthAngle=AZ+a;
+ctl.minPolarAngle=0.65;ctl.maxPolarAngle=1.25;ctl.minDistance=500;ctl.maxDistance=6000*Math.max(1,SC);ctl.update();ctl.saveState();
+const BX=mx/2,BZ=mz/2;function clampT(){const t=ctl.target,cx=Math.max(-BX,Math.min(BX,t.x)),cz=Math.max(-BZ,Math.min(BZ,t.z)),dx=cx-t.x,dz=cz-t.z;if(dx||dz){t.x+=dx;t.z+=dz;cam.position.x+=dx;cam.position.z+=dz}}
+function moveG(f,r){const d=cam.position.distanceTo(ctl.target),st=Math.max(8,d*0.012);const fw=new THREE.Vector3().subVectors(ctl.target,cam.position);fw.y=0;if(fw.lengthSq()<1e-6)return;fw.normalize();const rt=new THREE.Vector3(-fw.z,0,fw.x);const m=fw.multiplyScalar(f*st).add(rt.multiplyScalar(r*st));ctl.target.add(m);cam.position.add(m);clampT()}
+{const pad=document.getElementById('pad');let hold=null;const stop=()=>{hold=null};
+pad.querySelectorAll('button[data-m]').forEach(b=>{const [f,r]=b.dataset.m.split(',').map(Number);b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture&&b.setPointerCapture(e.pointerId);hold=[f,r];moveG(f,r)});['pointerup','pointercancel','lostpointercapture','pointerleave'].forEach(ev=>b.addEventListener(ev,stop));b.addEventListener('contextmenu',e=>e.preventDefault())});
+document.getElementById('rst').onclick=()=>{hold=null;ctl.enableDamping=false;ctl.update();ctl.reset();ctl.enableDamping=true};addEventListener('blur',stop);
+(function hl(){requestAnimationFrame(hl);if(hold)moveG(hold[0],hold[1])})();}
+window.__cam=cam;window.__BXZ=[BX,BZ];
+addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();ren.setSize(innerWidth,innerHeight);lr.setSize(innerWidth,innerHeight)});
+window.__ctl=ctl;(function f(){requestAnimationFrame(f);ctl.update();clampT();ren.render(scene,cam);lr.render(scene,cam)})();window.__ready=1;
+</script><a id="home" href="../" style="position:fixed;top:10px;right:10px;z-index:20;background:#1d3f8f;color:#fff;text-decoration:none;font:600 14px system-ui,sans-serif;padding:8px 14px;border-radius:20px;box-shadow:0 2px 6px #0004">⌂ <span id="homet">回首頁</span></a><script>(function(){var h=document.getElementById("home");if(!h)return;var q=new URLSearchParams(location.search);if(q.get("embed")==="1"||window.top!==window.self){h.style.display="none";return;}var b=q.get("back");if(!b)return;try{var u=new URL(b);if(u.protocol!=="https:"||!/(^|\.)ship\.place$|^gotagogo\.github\.io$/.test(u.hostname))return;var a=h.cloneNode(false);a.id="backday";a.removeAttribute("target");a.href=u.href;a.textContent=/\/maps3d\.html$/.test(u.pathname)?"\u2190 返回3D雪場地圖":"\u2190 返回當天行程";h.parentNode.insertBefore(a,h);h.style.display="none";}catch(e){}})();</script>
+<script>(()=>{const H={ja:'ホームへ',zh:'回首頁','zh-Hant':'回首頁',en:'Home'},u=()=>{const l=document.documentElement.lang||'zh';document.getElementById('homet').textContent=H[l]||H.zh;const q=new URLSearchParams(location.search).get('lang');document.getElementById('home').href='../'+(q?'?lang='+q:'')};u();new MutationObserver(u).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});addEventListener('popstate',u);const pos=()=>{const h=document.getElementById('home'),n=document.getElementById('n'),m=innerWidth<=600;if(m){h.style.top='auto';h.style.bottom=Math.max((n?n.offsetHeight:0)+12,66)+'px';h.style.right='8px'}else{h.style.top='10px';h.style.bottom='auto';h.style.right='10px'}};pos();addEventListener("resize",pos);setInterval(pos,500);setInterval(u,1000)})()</script>
+<style>#pad{position:fixed;right:12px;bottom:80px;z-index:18;display:grid;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,44px);gap:4px;user-select:none;-webkit-user-select:none;touch-action:none}
+#pad button{width:44px;height:44px;border:1px solid #fff8;border-radius:50%;background:#1d3f8fd9;color:#fff;font:700 18px system-ui,sans-serif;box-shadow:0 2px 6px #0004;touch-action:none;-webkit-tap-highlight-color:transparent;padding:0;cursor:pointer}
+#pad button:active{background:#0e2a6b}#pad #rst{background:#fffe;color:#1d3f8f;font-size:12px;border-color:#1d3f8f66}@media(max-width:600px){#pad{grid-template-columns:repeat(3,40px);grid-template-rows:repeat(3,40px)}#pad button{width:40px;height:40px}}</style>
+<div id="pad" aria-label="平移地圖"><span></span><button data-m="1,0" title="往前" aria-label="往前">▲</button><span></span><button data-m="0,-1" title="往左" aria-label="往左">◀</button><button id="rst" title="重設視角" aria-label="重設視角">重設</button><button data-m="0,1" title="往右" aria-label="往右">▶</button><span></span><button data-m="-1,0" title="往後" aria-label="往後">▼</button><span></span></div>
+<script>(()=>{const pd=document.getElementById('pad'),rs=document.getElementById('rst'),RL={ja:'リセット',en:'Reset'};const pos=()=>{const n=document.getElementById('n'),m=innerWidth<=600,nh=n?n.offsetHeight:0;let b=Math.max(nh+16,80);if(m){const h=document.getElementById('home');if(h&&getComputedStyle(h).display!=='none'&&h.style.bottom&&h.style.bottom!=='auto')b=Math.max(b,parseFloat(h.style.bottom)+h.offsetHeight+10)}pd.style.bottom=b+'px';rs.textContent=RL[(document.documentElement.lang||'').slice(0,2)]||'重設'};pos();addEventListener('resize',pos);setInterval(pos,500)})()</script>
+<div id="vtag" style="position:fixed;top:48px;right:12px;z-index:19;font:500 10px system-ui,sans-serif;color:#fff;background:#0007;padding:2px 7px;border-radius:9px;pointer-events:none;white-space:nowrap">v 3DMap-0009 · 2026-10-27</div></body></html>
